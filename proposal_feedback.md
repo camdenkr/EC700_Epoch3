@@ -37,3 +37,10 @@ notifying the user and logging data."
 Possible, but somewhat tangential. I'd imagine that by Week 2 you have a prototype, so another task could be developing something that works reliably (i.e., not just a prototype). Again that relies on the understanding you built in Week 1 on how networking and DNS work in the operating system you're choosing to develop for.
 
 ## What's the demo going to be?
+
+Mid-Epoch Demo:
+We are planning on demoing two test programs, one that attempts to connect to the internet using proper domain name, and the other one attempts to connect to the internet using a direct IP address. We will have a program running in the background that intercepts and blocks the direct IP requests that we specify, while allowing the DNS based queries to pass through without any hurdle.
+
+Final Demo:
+For our final demo, we will have a similar system as the mid epoch, but blocking all network traffic across the system that attempts to connect to an IP address directly and allowing all DNS based queries. We will be able to show with our own, made programs that attempt to perform these two types of connections as well as a program such as the browser that attempts to connect to an IP address directly will be blocked. We will also finally show a malware sample that attempts to connect to an IP address directly, and show that it’s communication is blocked with our project program running, showcasing the motivation for our project.
+
