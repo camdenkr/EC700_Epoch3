@@ -4,6 +4,8 @@ In order for the system to connect to a specific domain, it must first ask the �
 
 The resolver configuration file (resolv.conf) contains information that is read by the resolver routines when they are invoked by a process. “Nameserver” is the IP address of the name server (up to 3 in resolv.conf)., queried in the order listed in resolv.conf. “Domain” is the local domain name.  “Search” contains a list of domain search paths that are queries for names. Max 6 domains can be listed. “Options” configures timeout, ndots, roate, others. 
 
+Man Page: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
+
 Iptables reads the fields in the packet headers. We can add rules to block specific IP addresses, but need to figure out if that IP address was the result of a DNS resolution or a simple, direct request. If we can check when a network connection is being attempted, and cross reference the known hosts to look if the IP is associated with a cached host, we can block or allow the traffic. One method of doing this is setting up a firewall with very specific rules that call scripts in order to perform this task. If we use dnsmasq, I believe that all DNS queries will go through this (indirectly using resolv.conf), and caches results. This would be where we would check for the cache of DNS requests. In order to set a rule such that communication would be allowed if the IP exists in the DNS cache, we would need some kind of script within some kind of firewall rule or keep a separate script that adds to the rules
 
 Potential Tools:
@@ -24,8 +26,6 @@ Can record DNS lookups from processes such as browser
 Trying to find a way to make all processes
 https://sourceware.org/systemtap/SystemTap_Beginners_Guide/useful-systemtap-scripts.html
 Scripts to profile network activity ^
-
-
 
 Good sources:
 https://zwischenzugs.com/2018/06/08/anatomy-of-a-linux-dns-lookup-part-i/
