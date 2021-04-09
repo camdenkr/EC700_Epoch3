@@ -1,8 +1,3 @@
-Please create a deliverable (as a readable report in the git repo) for Week 1 that explains in much detail how your chosen target system resolves DNS names. What are the programs/services involved, how do they communicate with each other, etc. This is the background information you need to gather before you can start the project in earnest. Any lack in knowledge here will impede the project going forward.
-
-
-
-
 There is no specific mechanism that all applications use on the system level to resolve DNS names. “Ping” uses nsswitch.conf, while “host” does not but both use /etc/resolv.conf. 
 
 In order for the system to connect to a specific domain, it must first ask the “resolver” to find the IP address that belongs to that domain, before attempting to connect to it using that IP address. The resolver queries the local host file (/etc/hosts or other domain name servers, configured by /etc/host.conf). If the DNS machine knows the IP of the host, it returns it, otherwise it queries other name servers on the internet to find it. When it finds the IP, it will be passed along back to the resolver which will in turn give it back to the process that asked for it. After resolving which IP belongs to the DNS name that is being looked up, the process will attempt to connect to the IP directly. In other words, we need to track when a process attempts to make a DNS query, if an IP was returned, and if so allow connection to that IP address. If an attempt to connect to an IP address without making a DNS query was made, we should not allow that communication.
