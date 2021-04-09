@@ -1,0 +1,41 @@
+Please create a deliverable (as a readable report in the git repo) for Week 1 that explains in much detail how your chosen target system resolves DNS names. What are the programs/services involved, how do they communicate with each other, etc. This is the background information you need to gather before you can start the project in earnest. Any lack in knowledge here will impede the project going forward.
+
+
+
+
+There is no specific mechanism that all applications use on the system level to resolve DNS names. “Ping” uses nsswitch.conf, while “host” does not but both use /etc/resolv.conf. 
+
+In order for the system to connect to a specific domain, it must first ask the “resolver” to find the IP address that belongs to that domain, before attempting to connect to it using that IP address. The resolver queries the local host file (/etc/hosts or other domain name servers, configured by /etc/host.conf). If the DNS machine knows the IP of the host, it returns it, otherwise it queries other name servers on the internet to find it. When it finds the IP, it will be passed along back to the resolver which will in turn give it back to the process that asked for it. After resolving which IP belongs to the DNS name that is being looked up, the process will attempt to connect to the IP directly. In other words, we need to track when a process attempts to make a DNS query, if an IP was returned, and if so allow connection to that IP address. If an attempt to connect to an IP address without making a DNS query was made, we should not allow that communication.
+
+The resolver configuration file (resolv.conf) contains information that is read by the resolver routines when they are invoked by a process. “Nameserver” is the IP address of the name server (up to 3 in resolv.conf)., queried in the order listed in resolv.conf. “Domain” is the local domain name.  “Search” contains a list of domain search paths that are queries for names. Max 6 domains can be listed. “Options” configures timeout, ndots, roate, others. 
+
+Iptables reads the fields in the packet headers. We can add rules to block specific IP addresses, but need to figure out if that IP address was the result of a DNS resolution or a simple, direct request. If we can check when a network connection is being attempted, and cross reference the known hosts to look if the IP is associated with a cached host, we can block or allow the traffic. One method of doing this is setting up a firewall with very specific rules that call scripts in order to perform this task. If we use dnsmasq, I believe that all DNS queries will go through this (indirectly using resolv.conf), and caches results. This would be where we would check for the cache of DNS requests. In order to set a rule such that communication would be allowed if the IP exists in the DNS cache, we would need some kind of script within some kind of firewall rule or keep a separate script that adds to the rules
+
+Potential Tools:
+
+Dnsmasq - caches DNS requests, sends all DNS traffic through itself (port 53)
+Can be used to reference when a DNS request has been made
+Iptables - configures the firewall rules for network traffic
+Potential way to keep a group of processes from connecting to the internet:
+(source: https://askubuntu.com/questions/249826/how-to-disable-internet-connection-for-a-single-process)
+add a group "no-internet" and add your user to it
+sudo addgroup no-internet sudo adduser $USER no-internet
+add a iptables rule to prevent that group from accessing the network:
+iptables -I OUTPUT 1 -m owner --gid-owner no-internet -j DROP
+run the process you don't want to have internet access like with sg (execute command as different group ID):
+sg no-internet "process command line"
+SystemTap - scripting language that gathers info from Linux systems. Monitors and traces operations of the kernel. 
+Can record DNS lookups from processes such as browser
+Trying to find a way to make all processes
+https://sourceware.org/systemtap/SystemTap_Beginners_Guide/useful-systemtap-scripts.html
+Scripts to profile network activity ^
+
+
+
+Good sources:
+https://zwischenzugs.com/2018/06/08/anatomy-of-a-linux-dns-lookup-part-i/
+https://thekelleys.org.uk/dnsmasq/doc.html
+https://linuxhint.com/resolve_hostname_ip_address_bash_script/
+https://medium.com/@hsahu24/understanding-dns-resolution-and-resolv-conf-d17d1d64471c
+
+
