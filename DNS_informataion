@@ -8,6 +8,8 @@ Man Page: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
 
 Iptables reads the fields in the packet headers. We can add rules to block specific IP addresses, but need to figure out if that IP address was the result of a DNS resolution or a simple, direct request. If we can check when a network connection is being attempted, and cross reference the known hosts to look if the IP is associated with a cached host, we can block or allow the traffic. One method of doing this is setting up a firewall with very specific rules that call scripts in order to perform this task. If we use dnsmasq, I believe that all DNS queries will go through this (indirectly using resolv.conf), and caches results. This would be where we would check for the cache of DNS requests. In order to set a rule such that communication would be allowed if the IP exists in the DNS cache, we would need some kind of script within some kind of firewall rule or keep a separate script that adds to the rules
 
+
+
 Potential Tools:
 
 Dnsmasq - caches DNS requests, sends all DNS traffic through itself (port 53)
@@ -32,5 +34,56 @@ https://zwischenzugs.com/2018/06/08/anatomy-of-a-linux-dns-lookup-part-i/
 https://thekelleys.org.uk/dnsmasq/doc.html
 https://linuxhint.com/resolve_hostname_ip_address_bash_script/
 https://medium.com/@hsahu24/understanding-dns-resolution-and-resolv-conf-d17d1d64471c
+
+
+
+
+SystemTap Extra information: 
+From https://doc.opensuse.org/documentation/leap/archive/15.1/tuning/html/book.sle.tuning/cha-tuning-systemtap.html 
+SystemTap provides information similar to the output of tools like netstat, ps, top, and iostat. However, more filtering and analysis options can be used for the collected information.
+
+
+“Flexibility: SystemTap's framework allows users to develop simple scripts for investigating and monitoring a wide variety of kernel functions, system calls, and other events that occur in kernel space. As a result, SystemTap is not so much a tool as it is a system that allows you to develop your own kernel-specific forensic and monitoring tools.”
+
+
+
+NSS Service
+
+The Name Service Switch (NSS) connects the computer with a variety of sources of common configuration databases and name resolution mechanisms. These sources include local operating system files (such as /etc/passwd, /etc/group, and /etc/hosts), the Domain Name System (DNS), the Network Information Service (NIS, NIS+), and LDAP.
+
+
+Services:
+systemd -resolved: https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html
+
+
+
+Systemd-resolved:
+
+Application may submit network name resolution request using three interfaces:
+Systemd-resolved API
+Asynchronous
+Glibc getaddrinfo() API and related resolver function (gethostbyname())
+Synchronous
+Systemd-resolved local DNS stud listener on address localhost:53. Programs bypassing APIS may be directed to this stub in order to connect to systemd-resolved. 
+
+Some names are always resolved internally. Traditionally resolved by nss-files if provided in /etc/hosts
+
+Resolv.conf:
+https://man7.org/linux/man-pages/man5/resolv.conf.5.html
+
+Resolver
+
+
+
+
+/etc/hosts
+As your machine gets started, it will need to know the mapping of some hostnames to IP addresses before DNS can be referenced. This mapping is kept in the /etc/hosts file. In the absence of a name server, any network program on your system consults this file to determine the IP address that corresponds to a host name.
+
+
+
+
+To resolve names processes go through /etc/nsswitch.conf file. The “hosts” configuration (followed by “files” and “dns” specifies the order to check for resolutions/ First it checks local files then the DNS if the request isn’t found. The file the server will check is /etc/hosts. It will then check the DNS server. 
+
+
 
 
