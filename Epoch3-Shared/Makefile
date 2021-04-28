@@ -3,8 +3,10 @@ CFLAGS=-fPIC -shared
 LFLAGS=-ldl
 FMODE=0644
 
-libwrapper-getaddrinfo.so: libwrapper-getaddrinfo.c
+libwrapper-sdbuscall.so: libwrapper-sdbuscall.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+	#chown root $@
+	#chmod ug+s $@
 	chmod $(FMODE) $@
 
 clean:
